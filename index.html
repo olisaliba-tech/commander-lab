@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commander Lab</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<header>
+    <h1>Commander Lab</h1>
+    <p>Commander Deck Testing & Optimisation</p>
+</header>
+
+<!-- DASHBOARD -->
+
+<main id="dashboardPage">
+
+
+
+<section class="card">
+    <button
+        id="showImportBtn"
+        style="
+        font-size:20px;
+        padding:16px;
+        "
+    >
+        + Import Deck
+    </button>
+
+<textarea
+    id="deckImport"
+    style="display:none;"
+            rows="12"
+            placeholder="Paste Deckstats decklist here..."
+        ></textarea>
+
+        <button
+        id="continueImportBtn"
+        style="display:none;"
+>
+            Continue Import
+        </button>
+
+    </section>
+
+    <section
+        class="card"
+        id="deckDetailsCard"
+        style="display:none;"
+    >
+
+        <h2>Deck Details</h2>
+
+        <input
+            type="text"
+            id="deckName"
+            placeholder="Deck Name"
+        >
+
+        <input
+            type="text"
+            id="commanderName"
+            placeholder="Commander"
+        >
+<button id="findCommanderImageBtn">
+    Find Commander Image
+</button>
+
+<div
+    id="commanderImagePreview"
+    style="
+    width:120px;
+    height:120px;
+    background:#1f2937;
+    border-radius:8px;
+    margin:12px 0;
+    "
+>
+</div>
+        <select id="bracket">
+            <option>Unknown</option>
+            <option>Bracket 1</option>
+            <option>Bracket 2</option>
+            <option>Bracket 3</option>
+            <option>Bracket 4</option>
+            <option>Bracket 5</option>
+        </select>
+
+        <select id="colourIdentity">
+            <option value="">Select Colours</option>
+            <option>Colourless</option>
+            <option>W</option>
+            <option>U</option>
+            <option>B</option>
+            <option>R</option>
+            <option>G</option>
+            <option>WU</option>
+            <option>WB</option>
+            <option>WR</option>
+            <option>WG</option>
+            <option>UB</option>
+            <option>UR</option>
+            <option>UG</option>
+            <option>BR</option>
+            <option>BG</option>
+            <option>RG</option>
+            <option>WUB</option>
+            <option>WUR</option>
+            <option>WUG</option>
+            <option>WBR</option>
+            <option>WBG</option>
+            <option>WRG</option>
+            <option>UBR</option>
+            <option>UBG</option>
+            <option>URG</option>
+            <option>BRG</option>
+            <option>WUBR</option>
+            <option>WUBG</option>
+            <option>WURG</option>
+            <option>WBRG</option>
+            <option>UBRG</option>
+            <option>WUBRG</option>
+        </select>
+
+        <textarea
+            id="deckNotes"
+            rows="4"
+            placeholder="Notes"
+        ></textarea>
+
+        <button id="saveDeckBtn">
+            Save Deck
+        </button>
+
+    </section>
+
+    <section class="card">
+
+        <h2>Decks</h2>
+
+        
+        <ul id="deckList"></ul>
+
+    </section>
+
+</main>
+
+<!-- DECK VIEW PAGE -->
+
+<main
+    id="deckViewPage"
+    style="display:none;"
+>
+
+    <section class="card">
+
+        <button id="backButton">
+            ← Dashboard
+        </button>
+
+<div style="text-align:center;">
+
+<img
+id="deckHero"
+style="
+max-width:320px;
+width:100%;
+border-radius:12px;
+margin-bottom:16px;
+box-shadow:0 4px 12px rgba(0,0,0,.4);
+"
+>
+
+</div>
+
+<h1 id="viewDeckName">
+    Deck
+</h1>
+
+<div
+id="deckMeta"
+style="
+display:flex;
+justify-content:center;
+gap:24px;
+margin-bottom:20px;
+font-size:18px;
+flex-wrap:wrap;
+"
+>
+
+<span>
+⚔️
+<span id="viewCommander"></span>
+</span>
+
+<span>
+🏷️
+<span id="viewBracket"></span>
+</span>
+
+<span>
+🎨
+<span id="viewColours"></span>
+</span>
+
+</div>
+
+        <button id="logGameBtn">
+            Log Game
+        </button>
+
+        <button id="createVersionBtn">
+            Create Version
+        </button>
+        
+        <button id="editDeckBtn">
+            Edit Deck Details
+        </button>
+
+<section
+    class="card"
+    id="editDeckCard"
+    style="display:none;"
+>
+
+    <h2>Edit Deck</h2>
+
+    <input
+        type="text"
+        id="editDeckName"
+        placeholder="Deck Name"
+    >
+
+    <input
+        type="text"
+        id="editCommander"
+        placeholder="Commander"
+    >
+
+    <select id="editBracket">
+        <option>Unknown</option>
+        <option>Bracket 1</option>
+        <option>Bracket 2</option>
+        <option>Bracket 3</option>
+        <option>Bracket 4</option>
+        <option>Bracket 5</option>
+    </select>
+
+    <input
+        type="text"
+        id="editColours"
+        placeholder="Colours"
+    >
+
+    <textarea
+        id="editNotes"
+        rows="4"
+        placeholder="Notes"
+    ></textarea>
+
+    <button id="saveDeckChangesBtn">
+        Save Changes
+    </button>
+
+</section>
+
+
+    </section>
+
+    <section class="card">
+
+        <h2>
+            Deck Performance
+        </h2>
+
+        <div id="deckSummary"></div>
+
+        <h3>Mana Curve</h3>
+
+        <div id="manaCurve"></div>
+
+
+    </section>
+
+        <section class="card">
+
+        <h2>Deck Notes</h2>
+
+        <div id="deckNotesDisplay"></div>
+
+    </section>
+    
+    
+    <section class="card">
+
+        <h2>
+            Matchups
+        </h2>
+
+        <div id="matchupAnalytics"></div>
+
+    </section>
+
+
+
+
+
+    <section class="card">
+
+        <h2>
+            Version History
+        </h2>
+
+        <div id="versionHistory"></div>
+
+
+
+
+    </section>
+
+
+
+   <section class="card">
+
+    <h2>
+        Main Deck
+    </h2>
+
+<select
+id="mainDeckSort"
+
+style="
+background:#111827;
+color:white;
+border:1px solid #374151;
+padding:8px;
+border-radius:6px;
+margin-bottom:12px;
+"
+>
+
+    <option value="alpha">
+        Alphabetical
+    </option>
+
+    <option
+    value="score"
+    selected
+    >
+        Card Score
+    </option>
+
+    <option value="mvp">
+        MVP %
+    </option>
+
+    <option value="dud">
+        Dud %
+    </option>
+
+</select>
+
+    <button id="addMainDeckCardBtn">
+
+        Add Card
+
+    </button>
+
+    <div id="mainDeckList"></div>
+
+</section>
+
+    <section class="card">
+
+        <h2>
+            Sideboard
+        </h2>
+
+    <button id="addSideboardCardBtn">
+
+    Add Card
+
+    </button>
+
+        <div id="sideboardList"></div>
+
+    </section>
+
+    <section class="card">
+
+        <h2>
+            Maybeboard
+        </h2>
+
+        <button id="addMaybeboardCardBtn">
+            Add Card
+        </button>
+
+        <div id="maybeboardList"></div>
+
+    </section>
+
+</main>
+
+<!-- GAME REPORT PAGE -->
+<main
+    id="gameLogPage"
+    style="display:none;"
+>
+    <section class="card">
+
+        <button id="backFromGameBtn">
+            ← Back
+        </button>
+
+        <h2>Game Report</h2>
+
+        <select id="gameResult">
+            <option value="">Result</option>
+            <option>Win</option>
+            <option>Loss</option>
+        </select>
+
+        <select id="opponentDeck">
+            <option value="">Opponent Deck</option>
+        </select>
+
+        <select id="winCondition">
+            <option value="">Win Condition</option>
+            <option>Combat Damage</option>
+            <option>Commander Damage</option>
+            <option>Mill</option>
+            <option>Combo</option>
+            <option>Infinite Combo</option>
+            <option>Life Drain</option>
+            <option>Poison</option>
+            <option>Alternate Win Condition</option>
+            <option>Other</option>
+        </select>
+
+        <select id="lossCondition">
+            <option value="">Loss Condition</option>
+            <option>Combat Damage</option>
+            <option>Commander Damage</option>
+            <option>Mill</option>
+            <option>Combo</option>
+            <option>Infinite Combo</option>
+            <option>Life Drain</option>
+            <option>Poison</option>
+            <option>Decked Out</option>
+            <option>Concede</option>
+            <option>Other</option>
+        </select>
+
+        <select
+            id="turnCount"
+            style="
+            min-width:120px;
+            "
+>
+
+            <option value="">
+        Don't Know
+            </option>
+
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+            <option>8</option>
+            <option>9</option>
+            <option>10</option>
+            <option>11</option>
+            <option>12</option>
+            <option>13</option>
+            <option>14</option>
+            <option>15</option>
+            <option>16</option>
+            <option>17</option>
+            <option>18</option>
+            <option>19</option>
+            <option>20</option>
+</select>
+
+        <h3>Top MVPs</h3>
+
+        <select id="mvp1"></select>
+        <select id="mvp2"></select>
+        <select id="mvp3"></select>
+        <select id="mvp4"></select>
+        <select id="mvp5"></select>
+
+        <h3>Top Duds</h3>
+
+        <select id="dud1"></select>
+        <select id="dud2"></select>
+        <select id="dud3"></select>
+        <select id="dud4"></select>
+        <select id="dud5"></select>
+
+        <textarea
+            id="gameNotes"
+            rows="5"
+            placeholder="Game Notes"
+        ></textarea>
+
+        <button id="saveGameBtn">
+            Save Game
+        </button>
+
+    </section>
+</main>
+
+<script src="app.js"></script>
+
+</body>
+</html>
