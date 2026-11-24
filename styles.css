@@ -80,3 +80,105 @@ textarea {
     margin-bottom: 10px;
     resize: vertical;
 }
+
+#actionBar {
+
+    display:flex;
+
+    gap:12px;
+
+    margin-bottom:20px;
+
+}
+
+#actionBar button {
+
+    flex:1;
+
+    background:
+    linear-gradient(
+        135deg,
+        #6d28d9,
+        #4f46e5
+    );
+
+    border:none;
+
+}
+
+#actionBar button:hover {
+
+    background:
+    linear-gradient(
+        135deg,
+        #7c3aed,
+        #6366f1
+    );
+
+}
+#deckList {
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(
+        auto-fill,
+        minmax(
+            320px,
+            1fr
+        )
+    );
+
+    gap:16px;
+
+    padding:0;
+
+    margin:0;
+
+}
+#deckList li {
+
+    margin:0;
+
+}
+#deckActionBar {
+
+    display:flex;
+
+    gap:12px;
+
+    margin-top:16px;
+
+}
+
+#deckActionBar button {
+
+    flex:1;
+
+}
+#deckHeroLayout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+#deckHeroInfo {
+    flex: 1;
+}
+
+#deckMeta {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+#deckSummary {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 20px;
+}
+
+#deckActionBar {
+    display: flex;
+    gap: 12px;
+}

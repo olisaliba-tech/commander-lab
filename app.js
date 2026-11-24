@@ -5,6 +5,8 @@ JSON.parse(
 
 let importedDeckList = "";
 let currentDeckId = null;
+let editingGameIndex = null;
+let editingGameData = null;
 let selectedCommanderImage = "";
 let mainDeckSort =
 "score";
@@ -180,7 +182,14 @@ function render() {
 
     deckList.innerHTML = "";
 
-    decks.forEach(deck => {
+    [...decks]
+.sort(
+    (a,b) =>
+    (b.favourite || false)
+    -
+    (a.favourite || false)
+)
+.forEach(deck => {
 
         const card =
         document.createElement("li");
@@ -308,6 +317,24 @@ align-items:center;
 "
 >
 
+<span
+onclick="
+event.stopPropagation();
+toggleFavourite(${deck.id});
+"
+style="
+cursor:pointer;
+font-size:22px;
+color:${
+    deck.favourite
+    ? '#facc15'
+    : '#6b7280'
+};
+"
+>
+★
+</span>
+
 <button
 onclick="
 event.stopPropagation();
@@ -344,6 +371,26 @@ opacity:0.6;
 
 }
 
+function toggleFavourite(id) {
+
+    const deck =
+    decks.find(
+        d => d.id === id
+    );
+
+    if (!deck) {
+        return;
+    }
+
+    deck.favourite =
+    !deck.favourite;
+
+    saveData();
+
+    render();
+
+}
+
 function deleteDeck(id) {
 
     if (
@@ -363,6 +410,9 @@ function deleteDeck(id) {
     saveData();
     render();
 }
+
+window.toggleFavourite =
+toggleFavourite;
 
 window.deleteDeck =
 deleteDeck;
@@ -470,15 +520,36 @@ gamesWithTurns.length > 0
 
 "-";
 
-    document.getElementById(
-        "deckSummary"
-    ).innerHTML = `
-       <p>Games: ${totalGames}</p>
-       <p>Wins: ${wins}</p>
-      <p>Losses: ${losses}</p>
-      <p>Win Rate: ${winRate}%</p>
-     <p>Average Turn: ${avgTurn}</p>
-    `;
+document.getElementById(
+    "deckSummary"
+).innerHTML = `
+
+<div>
+<b>Games</b><br>
+${totalGames}
+</div>
+
+<div>
+<b>Wins</b><br>
+${wins}
+</div>
+
+<div>
+<b>Losses</b><br>
+${losses}
+</div>
+
+<div>
+<b>Win %</b><br>
+${winRate}
+</div>
+
+<div>
+<b>Avg Turn</b><br>
+${avgTurn}
+</div>
+
+`;
 
     const matchupMap = {};
 
@@ -784,7 +855,70 @@ topLosses
 
 });
 
+const recentGamesHtml =
+deck.games
+.slice()
+.reverse()
+.slice(0,10)
+.map(
+    (game,index) => `
+<div
+style="
+padding:8px;
+border-bottom:1px solid #374151;
+display:flex;
+justify-content:space-between;
+align-items:center;
+"
+>
 
+<span>
+${game.result}
+|
+T${game.turns || "-"}
+</span>
+
+<div
+style="
+display:flex;
+gap:4px;
+"
+>
+
+<button
+onclick="editGame(${deck.games.length - 1 - index})"
+style="
+width:auto;
+padding:4px 8px;
+background:#2563eb;
+"
+>
+✏️
+</button>
+
+<button
+onclick="deleteGame(${deck.games.length - 1 - index})"
+style="
+width:auto;
+padding:4px 8px;
+background:#dc2626;
+"
+>
+🗑
+</button>
+
+</div>
+
+</div>
+`
+)
+.join("");
+
+document.getElementById(
+    "recentGames"
+).innerHTML =
+recentGamesHtml ||
+"No games logged.";
 
 document.getElementById(
     "matchupAnalytics"
@@ -1988,8 +2122,120 @@ viewDeck;
 window.deleteVersion =
 deleteVersion;
 
+function editGame(
+    gameIndex
+) {
+
+    const deck =
+    decks.find(
+        d =>
+        d.id === currentDeckId
+    );
+
+    if (!deck) {
+        return;
+    }
+
+    const game =
+    deck.games[gameIndex];
+
+    if (!game) {
+        return;
+    }
+
+    editingGameIndex =
+    gameIndex;
+
+    editingGameData =
+    game;
+
+    document.getElementById(
+        "saveGameBtn"
+    ).textContent =
+    "Update Game";
+
+    document.getElementById(
+        "cancelEditGameBtn"
+    ).style.display =
+    "block";
+
+    document.getElementById(
+        "gameResult"
+    ).value =
+    game.result || "";
+
+    document.getElementById(
+        "opponentDeck"
+    ).value =
+    game.opponentDeckId || "";
+
+    document.getElementById(
+        "winCondition"
+    ).value =
+    game.winCondition || "";
+
+    document.getElementById(
+        "lossCondition"
+    ).value =
+    game.lossCondition || "";
+
+    document.getElementById(
+        "turnCount"
+    ).value =
+    game.turns || "";
+
+    document.getElementById(
+        "gameNotes"
+    ).value =
+    game.notes || "";
+
+    showGameLog();
+
+}
+
+function deleteGame(
+    gameIndex
+) {
+
+    const deck =
+    decks.find(
+        d =>
+        d.id === currentDeckId
+    );
+
+    if (!deck) {
+        return;
+    }
+
+    if (
+        !confirm(
+            "Delete this game?"
+        )
+    ) {
+        return;
+    }
+
+    deck.games.splice(
+        gameIndex,
+        1
+    );
+
+    saveData();
+
+    viewDeck(
+        currentDeckId
+    );
+
+}
+
 window.editDeckDetails =
 editDeckDetails;
+
+window.editGame =
+editGame;
+
+window.deleteGame =
+deleteGame;
 
 continueImportBtn.addEventListener(
     "click",
@@ -2161,9 +2407,10 @@ if (
 
         if (data.object === "error") {
 
-            alert(
-                `Card not found:\n${cardName}`
-            );
+        alert(
+            `Card not found:\n${cardName}\n\n` +
+            JSON.stringify(data)
+        );
 
             return;
         }
@@ -2496,9 +2743,10 @@ const duds = [
     document.getElementById("dud5")?.value
 ].filter(Boolean);
 
-deck.games.push({
+const gameData = {
 
     date:
+    editingGameData?.date ||
     new Date()
     .toISOString(),
 
@@ -2506,7 +2754,6 @@ deck.games.push({
     deck.versions[
         deck.versions.length - 1
     ].version,
-
 
     result:
     result,
@@ -2532,7 +2779,23 @@ deck.games.push({
     notes:
     notes
 
-});
+};
+
+if (
+    editingGameIndex !== null
+) {
+
+    deck.games[
+        editingGameIndex
+    ] = gameData;
+
+} else {
+
+    deck.games.push(
+        gameData
+    );
+
+}
 
 if (opponentDeckId) {
 
@@ -2583,6 +2846,20 @@ if (opponentDeckId) {
     }
 
 }
+
+        editingGameIndex = null;
+
+        editingGameData = null;
+
+        document.getElementById(
+        "saveGameBtn"
+        ).textContent =
+        "Save Game";
+
+        document.getElementById(
+            "cancelEditGameBtn"
+        ).style.display =
+        "none";
 
         saveData();
         render();
@@ -2799,6 +3076,14 @@ async function () {
     ];
 
 try {
+
+await new Promise(
+    resolve =>
+    setTimeout(
+        resolve,
+        100
+    )
+);
 
     const response =
     await fetch(
@@ -3019,5 +3304,150 @@ document
     }
 );
 
+document
+.getElementById(
+    "exportDataBtn"
+)
+?.addEventListener(
+    "click",
+    function () {
 
+        const blob =
+        new Blob(
+            [
+                JSON.stringify(
+                    decks,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:
+                "application/json"
+            }
+        );
+
+        const link =
+        document.createElement(
+            "a"
+        );
+
+        link.href =
+        URL.createObjectURL(
+            blob
+        );
+
+        link.download =
+        "commanderlab-backup.json";
+
+        link.click();
+
+    }
+);
+
+document
+.getElementById(
+    "importDataBtn"
+)
+?.addEventListener(
+    "click",
+    function () {
+
+        document
+        .getElementById(
+            "importDataFile"
+        )
+        .click();
+
+    }
+);
+
+document
+.getElementById(
+    "importDataFile"
+)
+?.addEventListener(
+    "change",
+    function (event) {
+
+        const file =
+        event.target.files[0];
+
+        if (!file) {
+            return;
+        }
+
+        const reader =
+        new FileReader();
+
+        reader.onload =
+        function (e) {
+
+            try {
+
+                decks =
+                JSON.parse(
+                    e.target.result
+                );
+
+                saveData();
+
+                render();
+
+                alert(
+                    "Import Complete"
+                );
+
+            } catch {
+
+                alert(
+                    "Invalid Backup File"
+                );
+
+            }
+
+        };
+
+        reader.readAsText(
+            file
+        );
+
+    }
+);
+
+
+document
+.getElementById(
+    "cancelEditGameBtn"
+)
+?.addEventListener(
+    "click",
+    function () {
+
+        editingGameIndex =
+        null;
+
+        editingGameData =
+        null;
+
+        document.getElementById(
+            "saveGameBtn"
+        ).textContent =
+        "Save Game";
+
+        document.getElementById(
+            "cancelEditGameBtn"
+        ).style.display =
+        "none";
+
+        if (
+            currentDeckId
+        ) {
+            viewDeck(
+                currentDeckId
+            );
+        }
+
+    }
+);
 render();
